@@ -6,7 +6,12 @@ function getOwner(req) {
 }
 
 async function upload(req, res) {
-  const document = await documentService.create(req.file, getOwner(req));
+  const file = req.file && {
+    originalName: req.file.originalname,
+    size: req.file.size,
+    storageName: req.file.filename,
+  };
+  const document = await documentService.create(file, getOwner(req));
   res.status(201).json(document);
 }
 

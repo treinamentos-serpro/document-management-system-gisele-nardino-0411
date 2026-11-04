@@ -1,14 +1,11 @@
 const express = require('express');
 const fs = require('node:fs');
-const path = require('node:path');
 const { randomUUID } = require('node:crypto');
 const multer = require('multer');
 const documentController = require('../controllers/documentController');
+const { storageDirectory } = require('../config/storage');
 
 const router = express.Router();
-const storageDirectory = path.resolve(
-  process.env.STORAGE_DIR || path.join(__dirname, '../../storage'),
-);
 const maxFileSize = Number(process.env.MAX_FILE_SIZE_BYTES || 10 * 1024 * 1024);
 
 if (!Number.isSafeInteger(maxFileSize) || maxFileSize <= 0) {
