@@ -13,7 +13,7 @@ function resolveStoragePath(storageName) {
     throw new Error('Nome de armazenamento inválido.');
   }
 
-  return path.join(storageDirectory, storageName);
+  return path.join(storageDirectory, path.basename(storageName));
 }
 
 async function findPath(storageName) {
