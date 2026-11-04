@@ -5,8 +5,19 @@ const storageDirectory = path.resolve(
   process.env.STORAGE_DIR || path.join(__dirname, '../../storage'),
 );
 
+function resolveStoragePath(storageName) {
+  if (
+    typeof storageName !== 'string'
+    || !/^[\da-f]{8}-[\da-f]{4}-4[\da-f]{3}-[89ab][\da-f]{3}-[\da-f]{12}$/i.test(storageName)
+  ) {
+    throw new Error('Nome de armazenamento inválido.');
+  }
+
+  return path.join(storageDirectory, storageName);
+}
+
 async function findPath(storageName) {
-  const filePath = path.resolve(storageDirectory, storageName);
+  const filePath = resolveStoragePath(storageName);
 
   try {
     await fs.access(filePath);
@@ -19,8 +30,8 @@ async function findPath(storageName) {
   }
 }
 
-function remove(filePath) {
-  return fs.unlink(filePath);
+function remove(storageName) {
+  return fs.unlink(resolveStoragePath(storageName));
 }
 
 module.exports = { findPath, remove };

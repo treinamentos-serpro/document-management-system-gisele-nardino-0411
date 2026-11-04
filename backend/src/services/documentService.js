@@ -19,7 +19,7 @@ async function create(file, owner) {
       storageName: file.filename,
     });
   } catch (error) {
-    await documentFileRepository.remove(file.path).catch(() => {});
+    await documentFileRepository.remove(file.filename).catch(() => {});
     throw error;
   }
 }
