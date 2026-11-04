@@ -1,11 +1,6 @@
-const fs = require('node:fs/promises');
-const path = require('node:path');
 const documentRepository = require('../repositories/documentRepository');
+const fileRepository = require('../repositories/fileRepository');
 const AppError = require('./appError');
-
-const storageDirectory = path.resolve(
-  process.env.STORAGE_DIR || path.join(__dirname, '../../storage'),
-);
 
 async function create(file, owner) {
   if (!file) {
@@ -14,13 +9,17 @@ async function create(file, owner) {
 
   try {
     return documentRepository.create({
-      originalName: file.originalname,
+      originalName: file.originalName,
       size: file.size,
       owner,
-      storageName: file.filename,
+      storageName: file.storageName,
     });
   } catch (error) {
-    await fs.unlink(file.path).catch(() => {});
+    try {
+      await fileRepository.remove(file.storageName);
+    } catch (cleanupError) {
+      console.error('Falha ao remover arquivo após erro no registro de metadados.', cleanupError);
+    }
     throw error;
   }
 }
@@ -31,20 +30,12 @@ async function list(owner) {
 
 async function getForDownload(id, owner) {
   const document = documentRepository.findById(id);
+  const filePath = document && document.owner === owner
+    ? await fileRepository.findPath(document.storageName)
+    : null;
 
-  if (!document || document.owner !== owner) {
+  if (!filePath) {
     throw new AppError(404, 'DOCUMENT_NOT_FOUND', 'Documento não encontrado.');
-  }
-
-  const filePath = path.resolve(storageDirectory, document.storageName);
-
-  try {
-    await fs.access(filePath);
-  } catch (error) {
-    if (error.code === 'ENOENT') {
-      throw new AppError(404, 'DOCUMENT_NOT_FOUND', 'Documento não encontrado.');
-    }
-    throw error;
   }
 
   return { filePath, originalName: document.originalName };

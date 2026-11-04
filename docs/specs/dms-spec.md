@@ -195,6 +195,7 @@ Fluxo de dependência obrigatório: `routes -> controllers -> services -> reposi
 - **Controllers:** traduzem entrada/saída HTTP, validam a presença dos dados necessários, invocam serviços e convertem erros conhecidos em status e códigos de API.
 - **Services:** concentram regras de negócio, associação ao usuário, autorização por proprietário, registro de metadados e coordenação das operações necessárias.
 - **Repositories:** mantêm metadados em memória e fornecem acesso ao arquivo local. Não conhecem Express nem objetos de requisição/resposta.
+- O controller converte o arquivo recebido pelo Multer em dados de entrada do serviço (`originalName`, `size`, `storageName`). O serviço coordena o repositório de metadados e o repositório de arquivos; este último verifica arquivos e executa remoções compensatórias. A configuração do diretório local é compartilhada com o middleware de upload.
 - **Composição da aplicação:** configura Express e injeta dependências nas rotas; mantém o endpoint de saúde existente (`GET /health`).
 - As camadas internas não dependem de Express. Não se adicionam banco de dados, armazenamento remoto ou estruturas arquiteturais além dessas quatro camadas.
 
